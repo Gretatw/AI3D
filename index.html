@@ -110,6 +110,9 @@ body{background:#a9cfe0;color:var(--ink);font-family:var(--f-body);overflow:hidd
 .timeline li{display:grid;grid-template-columns:52px 1fr;gap:10px;font-size:13.5px;line-height:1.6}
 .timeline b{font:500 13px var(--f-mono);color:var(--brick);font-variant-numeric:tabular-nums}
 
+#copyright{position:fixed;z-index:4;left:50%;transform:translateX(-50%);bottom:calc(1px + env(safe-area-inset-bottom,0px));
+  margin:0;font:400 10.5px/14px var(--f-body);letter-spacing:.04em;color:#fff;white-space:nowrap;
+  text-shadow:0 1px 2px rgba(59,47,38,.7);pointer-events:none}
 .works{display:grid;gap:10px}
 .wk{background:#fffdf7;border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-width:0}
 .wk-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
@@ -261,6 +264,8 @@ body{background:#a9cfe0;color:var(--ink);font-family:var(--f-body);overflow:hidd
   </header>
   <div class="body" id="pBody"></div>
 </aside>
+
+<footer id="copyright">Copyright © 2026 許淑茹 老師. All Rights Reserved.</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
