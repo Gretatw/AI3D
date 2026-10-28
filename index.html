@@ -1,0 +1,1151 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>鹽分地帶天空之城</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@400;700&family=Noto+Sans+TC:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: full-bleed 3D canvas; paper-craft cards float at the corners like museum captions pinned on a diorama. */
+:root{
+  --paper:#fbf6ec;          /* handmade paper card */
+  --paper-2:#f3ead8;
+  --ink:#3b2f26;            /* brown-black ink */
+  --ink-soft:#7a6553;
+  --brick:#b5543a;          /* 臺南州廳 red brick */
+  --salt:#e9eef0;           /* sea-salt white */
+  --sea:#3f7f8c;            /* lagoon teal */
+  --line:rgba(59,47,38,.16);
+  --f-display:"LXGW WenKai TC","Kaiti TC","STKaiti","Noto Serif TC",serif;
+  --f-body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+  --f-mono:"DM Mono",ui-monospace,Menlo,monospace;
+  color-scheme:light;
+}
+html,body{height:100%}
+body{background:#a9cfe0;color:var(--ink);font-family:var(--f-body);overflow:hidden;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+#stage{position:fixed;inset:0;display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+#stage:active{cursor:grabbing}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:14px;
+  box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 10px 30px -12px rgba(59,47,38,.45);
+  background-image:radial-gradient(rgba(122,101,83,.06) 1px,transparent 1px);background-size:5px 5px}
+.ui{position:fixed;z-index:5}
+
+/* brand */
+#brand{top:calc(16px + env(safe-area-inset-top,0px));left:max(16px,env(safe-area-inset-left,0px));
+  padding:14px 18px 14px;max-width:320px}
+#brand .org{font:500 11px/1 var(--f-body);letter-spacing:.18em;color:var(--brick);display:flex;align-items:center;gap:8px}
+#brand .org::before{content:"";width:10px;height:10px;border-radius:2px;background:var(--brick);transform:rotate(45deg)}
+#brand h1{font:700 30px/1.15 var(--f-display);margin:8px 0 4px;letter-spacing:.04em;text-wrap:balance}
+#brand p{margin:0;font-size:13px;line-height:1.6;color:var(--ink-soft)}
+
+/* live panel */
+#live{top:calc(16px + env(safe-area-inset-top,0px));right:max(16px,env(safe-area-inset-right,0px));
+  width:260px;padding:14px 16px}
+.live-h{display:flex;justify-content:space-between;align-items:center;font-size:11px;letter-spacing:.14em;color:var(--ink-soft)}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#d9483b;margin-right:6px;
+  box-shadow:0 0 0 0 rgba(217,72,59,.6);animation:pulse 2s infinite}
+.dot.off{background:#a39380;animation:none}
+@keyframes pulse{70%{box-shadow:0 0 0 7px rgba(217,72,59,0)}100%{box-shadow:0 0 0 0 rgba(217,72,59,0)}}
+#clock{font:500 34px/1 var(--f-mono);margin:8px 0 2px;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+#date{font-size:12px;color:var(--ink-soft)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)}
+.kv span{display:block;font-size:10.5px;letter-spacing:.1em;color:var(--ink-soft)}
+.kv b{font:500 14px/1.4 var(--f-body);font-variant-numeric:tabular-nums}
+.kv b small{font:400 11px var(--f-body);color:var(--ink-soft)}
+.scrub{margin-top:12px;padding-top:10px;border-top:1px dashed var(--line)}
+.scrub label{display:flex;justify-content:space-between;font-size:11px;color:var(--ink-soft);letter-spacing:.06em}
+.scrub input{width:100%;accent-color:var(--brick);margin:6px 0 2px}
+.btn{font:500 12px var(--f-body);color:var(--ink);background:var(--paper-2);border:1px solid var(--line);
+  border-radius:999px;padding:5px 12px;cursor:pointer}
+.btn:hover{background:#ecdfc6}
+.btn:focus-visible,.chip:focus-visible,#close:focus-visible{outline:2px solid var(--brick);outline-offset:2px}
+#toggleLive{display:none}
+
+/* nav */
+#nav{left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));
+  display:flex;gap:6px;padding:6px;max-width:calc(100vw - 32px);overflow-x:auto;scrollbar-width:none}
+#nav::-webkit-scrollbar{display:none}
+.chip{flex:none;display:flex;flex-direction:column;align-items:flex-start;gap:2px;border:0;background:transparent;
+  padding:7px 12px;border-radius:10px;cursor:pointer;color:var(--ink);text-align:left;font-family:var(--f-body)}
+.chip small{font-size:10px;letter-spacing:.12em;color:var(--ink-soft)}
+.chip span{font:700 15px var(--f-display);white-space:nowrap}
+.chip:hover{background:var(--paper-2)}
+.chip[aria-current="true"]{background:var(--ink);color:var(--paper)}
+.chip[aria-current="true"] small{color:#d8c7ae}
+
+/* floating labels */
+#tags{position:fixed;inset:0;pointer-events:none;z-index:3}
+.tag{position:absolute;transform:translate(-50%,-100%);pointer-events:auto;cursor:pointer;
+  font:700 13px var(--f-display);background:var(--paper);color:var(--ink);border:1px solid var(--line);
+  padding:4px 10px 4px 8px;border-radius:999px;white-space:nowrap;display:flex;gap:6px;align-items:center;
+  box-shadow:0 4px 12px -4px rgba(59,47,38,.4);transition:opacity .3s}
+.tag i{font:500 10px var(--f-mono);font-style:normal;background:var(--brick);color:#fff;border-radius:999px;padding:1px 6px}
+.tag::after{content:"";position:absolute;left:50%;bottom:-6px;width:1px;height:6px;background:var(--ink-soft)}
+
+/* detail panel */
+#panel{right:max(16px,env(safe-area-inset-right,0px));top:calc(16px + env(safe-area-inset-top,0px));
+  bottom:calc(96px + env(safe-area-inset-bottom,0px));width:min(380px,calc(100vw - 32px));
+  display:flex;flex-direction:column;overflow:hidden;transform:translateX(calc(100% + 40px));transition:transform .55s cubic-bezier(.2,.8,.2,1);z-index:6}
+#panel.open{transform:none}
+#panel header{padding:18px 20px 12px;border-bottom:1px dashed var(--line);position:relative}
+#panel .place{font:500 11px var(--f-mono);letter-spacing:.12em;color:var(--brick)}
+#panel h2{font:700 26px/1.2 var(--f-display);margin:6px 0 2px;text-wrap:balance}
+#panel .sub{font-size:13px;color:var(--ink-soft)}
+#close{position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;border:1px solid var(--line);
+  background:var(--paper-2);cursor:pointer;font-size:16px;color:var(--ink)}
+#panel .body{padding:16px 20px 20px;overflow-y:auto;min-width:0}
+#panel .body p{font-size:14.5px;line-height:1.85;margin:0 0 12px;max-width:62ch}
+.nowbox{display:flex;gap:10px;align-items:flex-start;background:var(--paper-2);border-radius:10px;padding:10px 12px;margin:0 0 14px}
+.nowbox .lbl{flex:none;font:500 10px var(--f-mono);letter-spacing:.1em;background:var(--sea);color:#fff;border-radius:4px;padding:3px 6px;margin-top:2px}
+.nowbox div{font-size:13.5px;line-height:1.6}
+.h3{font:700 12px var(--f-body);letter-spacing:.16em;color:var(--ink-soft);margin:16px 0 8px}
+.people{display:flex;flex-wrap:wrap;gap:6px}
+.people span{font:400 13px var(--f-display);border:1px solid var(--line);border-radius:6px;padding:3px 9px;background:#fff8}
+.timeline{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.timeline li{display:grid;grid-template-columns:52px 1fr;gap:10px;font-size:13.5px;line-height:1.6}
+.timeline b{font:500 13px var(--f-mono);color:var(--brick);font-variant-numeric:tabular-nums}
+
+.works{display:grid;gap:10px}
+.wk{background:#fffdf7;border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-width:0}
+.wk-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.wk h4{margin:0;font:700 16px/1.4 var(--f-display);text-wrap:balance}
+.wk-badge{flex:none;font:500 10.5px var(--f-body);letter-spacing:.04em;color:#8a5a12;background:#f6e3b8;border:1px dashed #c99a3e;border-radius:4px;padding:2px 6px;white-space:nowrap}
+.wk-badge.ok{color:#fff;background:var(--sea);border:1px solid var(--sea)}
+.wk-meta{font:400 12px var(--f-body);color:var(--ink-soft);margin:2px 0 6px}
+#panel .body .wk p{font-size:13.5px;line-height:1.75;margin:0}
+.wk-src{margin-top:6px;font-size:11px;color:var(--ink-soft);overflow-wrap:anywhere}
+.wk-src a{color:var(--sea)}
+#hint{left:50%;transform:translateX(-50%);bottom:calc(92px + env(safe-area-inset-bottom,0px));
+  font-size:12px;color:#fff;background:rgba(59,47,38,.55);padding:6px 12px;border-radius:999px;transition:opacity .6s;pointer-events:none}
+#loader{position:fixed;inset:0;display:grid;place-items:center;z-index:20;background:#a9cfe0;color:var(--ink);
+  font:700 20px var(--f-display);transition:opacity .8s}
+#loader.done{opacity:0;pointer-events:none}
+
+/* guide 琵琵 */
+#guide{left:max(16px,env(safe-area-inset-left,0px));bottom:calc(96px + env(safe-area-inset-bottom,0px));
+  width:min(380px,calc(100vw - 32px));padding:12px 14px 14px;display:flex;flex-direction:column;gap:10px}
+.g-head{display:flex;align-items:center;gap:10px}
+.g-ava{flex:none;width:40px;height:40px;border-radius:50%;overflow:hidden;box-shadow:0 0 0 2px var(--paper),0 0 0 3px var(--line)}
+.g-ava.talk{animation:bob .5s ease-in-out infinite alternate}
+@keyframes bob{to{transform:translateY(-2px) rotate(-4deg)}}
+.g-who{flex:1;min-width:0;display:flex;flex-direction:column}
+.g-who b{font:700 17px var(--f-display)}
+.g-who span{font-size:11px;color:var(--ink-soft);letter-spacing:.06em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.g-mini{padding:4px 10px;font-size:11.5px}
+.g-mini[aria-pressed="false"]{color:var(--ink-soft);text-decoration:line-through}
+.g-body{display:flex;flex-direction:column;gap:10px}
+#guide.min .g-body{display:none}
+.g-q{font-size:12.5px;color:var(--ink-soft);border-left:3px solid var(--sea);padding-left:8px}
+#gText{margin:0;font:400 15.5px/1.75 var(--f-display);min-height:3.5em;max-height:9.5em;overflow-y:auto;
+  background:#fff9;border:1px solid var(--line);border-radius:4px 14px 14px 14px;padding:10px 12px;white-space:pre-wrap}
+.g-prog{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink-soft)}
+.g-prog i{width:18px;height:4px;border-radius:2px;background:var(--line)}
+.g-prog i.on{background:var(--brick)}
+.g-prog i.done{background:#d8a08f}
+.g-ctrl{display:flex;flex-wrap:wrap;gap:6px}
+#gTourCtl{display:flex;flex-wrap:wrap;gap:6px}
+#gTourCtl[hidden]{display:none}
+.btn.primary{background:var(--brick);color:#fff;border-color:var(--brick)}
+.btn.primary:hover{background:#9c4530}
+.btn:disabled{opacity:.5;cursor:default}
+.g-ask{display:flex;flex-direction:column;gap:6px;padding-top:10px;border-top:1px dashed var(--line)}
+.g-chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.g-chips::-webkit-scrollbar{display:none}
+.g-chips button{flex:none;font:400 12px var(--f-body);border:1px dashed var(--ink-soft);background:transparent;color:var(--ink);border-radius:999px;padding:4px 10px;cursor:pointer}
+.g-chips button:hover{background:var(--paper-2)}
+.g-row{display:flex;gap:6px}
+.g-row input{flex:1;min-width:0;font:400 14px var(--f-body);color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:999px;padding:7px 12px}
+.g-row input:focus-visible{outline:2px solid var(--sea);outline-offset:1px}
+.g-note{font-size:10.5px;color:var(--ink-soft)}
+
+@media (max-width:760px){
+  #guide{top:calc(76px + env(safe-area-inset-top,0px));bottom:auto;width:auto;right:max(16px,env(safe-area-inset-right,0px));padding:10px 12px}
+  #gText{font-size:14.5px;max-height:6.5em}
+  #hint{display:none}
+  body.panel-open #guide .g-ask,body.panel-open #guide .g-ctrl,body.panel-open #guide .g-prog{display:none}
+  body.touring #live{display:none}
+}
+@media (max-width:760px){
+  #brand{max-width:calc(100vw - 32px);right:max(16px,env(safe-area-inset-right,0px));padding:10px 14px}
+  #brand h1{font-size:22px;margin:6px 0 2px}
+  #brand p{display:none}
+  #live{top:auto;bottom:calc(84px + env(safe-area-inset-bottom,0px));right:max(16px,env(safe-area-inset-right,0px));width:auto;left:max(16px,env(safe-area-inset-left,0px));padding:10px 14px}
+  #live.collapsed .grid,#live.collapsed .scrub{display:none}
+  #clock{font-size:22px;margin:4px 0 0}
+  #toggleLive{display:inline-block}
+  #panel{top:auto;bottom:0;right:0;left:0;width:auto;max-height:68vh;border-radius:18px 18px 0 0;
+    transform:translateY(105%);padding-bottom:env(safe-area-inset-bottom,0px);
+    padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+  #hint{bottom:auto;top:calc(90px + env(safe-area-inset-top,0px))}
+}
+@media (prefers-reduced-motion:reduce){#panel{transition:none}.dot{animation:none}}
+</style>
+
+<div id="loader">雲海正在升起……</div>
+<canvas id="stage" aria-label="鹽分地帶浮空群島 3D 場景"></canvas>
+<div id="tags"></div>
+
+<section id="brand" class="ui card">
+  <div class="org">國立臺灣文學館 · 線上特展</div>
+  <h1>臺南鹽分地帶文學</h1>
+  <p>漂在雲海上的六座小島，每一座都是北門郡沿海的一段文學記憶。拖曳旋轉、滾輪縮放，點擊島嶼登島閱讀。</p>
+</section>
+
+<section id="live" class="ui card collapsed" aria-live="polite">
+  <div class="live-h"><span><i class="dot" id="liveDot"></i><span id="liveLabel">即時 · 北門天空</span></span>
+    <button class="btn" id="toggleLive" aria-expanded="false">展開</button></div>
+  <div id="clock">--:--</div>
+  <div id="date">—</div>
+  <div class="grid">
+    <div class="kv"><span>天色</span><b id="phase">—</b></div>
+    <div class="kv"><span>太陽高度</span><b id="alt">—</b></div>
+    <div class="kv"><span>日出 / 日落</span><b id="rise">—</b></div>
+    <div class="kv"><span>月相</span><b id="moon">—</b></div>
+    <div class="kv"><span>節氣</span><b id="term">—</b></div>
+    <div class="kv"><span>曬鹽日照</span><b id="saltIdx">—</b></div>
+  </div>
+  <div class="scrub">
+    <label for="scrub"><span>時光捲軸</span><span id="offsetLbl">現在</span></label>
+    <input type="range" id="scrub" min="-24" max="24" step="0.25" value="0">
+    <button class="btn" id="nowBtn">回到現在</button>
+  </div>
+</section>
+
+<nav id="nav" class="ui card" aria-label="島嶼導覽"></nav>
+<div id="hint" class="ui">拖曳旋轉 · 點擊島嶼登島</div>
+
+<section id="guide" class="ui card" aria-label="導覽員琵琵">
+  <div class="g-head">
+    <div class="g-ava" id="gAva" aria-hidden="true"><svg viewBox="0 0 40 40" width="40" height="40"><circle cx="20" cy="20" r="20" fill="#3f7f8c"/><ellipse cx="15" cy="24" rx="10" ry="9" fill="#fdfcf8"/><ellipse cx="19" cy="24" rx="5.5" ry="4.8" fill="#232220"/><rect x="21" y="23" width="12" height="2.6" rx="1.3" fill="#232220"/><circle cx="34" cy="24.3" r="3.2" fill="#232220"/><circle cx="18" cy="22" r="1.3" fill="#fdfcf8"/><path d="M5 16 L17 9 L29 16 Z" fill="#d9b56a"/><rect x="9" y="15" width="16" height="2" fill="#b5543a"/></svg></div>
+    <div class="g-who"><b>琵琵</b><span id="gStatus">黑面琵鷺 · 鹽分地帶導覽員</span></div>
+    <button class="btn g-mini" id="gVoice" aria-pressed="true" hidden>朗讀</button>
+    <button class="btn g-mini" id="gMin" aria-expanded="true">收起</button>
+  </div>
+  <div class="g-body">
+    <div class="g-q" id="gQ" hidden></div>
+    <p id="gText" aria-live="polite">嗨，我是琵琵，一隻從七股潟湖飛來的黑面琵鷺。按「開始導覽」，我帶你一路飛過六座島。</p>
+    <div class="g-prog" id="gProg" hidden></div>
+    <div class="g-ctrl">
+      <button class="btn primary" id="gStart">開始導覽</button>
+      <span id="gTourCtl" hidden>
+        <button class="btn" id="gPrev">上一站</button>
+        <button class="btn" id="gPause">暫停</button>
+        <button class="btn" id="gNext">下一站</button>
+        <button class="btn" id="gEnd">結束導覽</button>
+      </span>
+    </div>
+    <form class="g-ask" id="gAsk" hidden>
+      <div class="g-chips" id="gChips"></div>
+      <div class="g-row">
+        <input id="gInput" aria-label="向琵琵提問" type="text" maxlength="200" placeholder="想問琵琵什麼？例如：誰是北門七子？" autocomplete="off">
+        <button class="btn primary" id="gSend" type="submit">問琵琵</button>
+      </div>
+      <div class="g-note">回答由 Claude 即時產生，可能有誤，史實請以臺灣文學館資料為準。</div>
+    </form>
+  </div>
+</section>
+
+<aside id="panel" class="ui card" aria-hidden="true">
+  <header>
+    <div class="place" id="pPlace"></div>
+    <h2 id="pTitle"></h2>
+    <div class="sub" id="pSub"></div>
+    <button id="close" aria-label="關閉">✕</button>
+  </header>
+  <div class="body" id="pBody"></div>
+</aside>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+(function(){
+"use strict";
+const LAT=23.27, LON=120.13; // 北門
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------------- astronomy (real-time) ---------------- */
+const rad=Math.PI/180;
+function sunAt(ms){
+  const d=(ms-946728000000)/86400000;
+  const g=(357.529+0.98560028*d)*rad, q=280.459+0.98564736*d;
+  let L=(q+1.915*Math.sin(g)+0.020*Math.sin(2*g))%360; if(L<0)L+=360;
+  const e=(23.439-0.00000036*d)*rad, Lr=L*rad;
+  const ra=Math.atan2(Math.cos(e)*Math.sin(Lr),Math.cos(Lr));
+  const dec=Math.asin(Math.sin(e)*Math.sin(Lr));
+  let gmst=(18.697374558+24.06570982441908*d)%24;
+  const ha=((gmst*15+LON)*rad)-ra;
+  const la=LAT*rad;
+  const alt=Math.asin(Math.sin(la)*Math.sin(dec)+Math.cos(la)*Math.cos(dec)*Math.cos(ha));
+  const az=Math.atan2(-Math.sin(ha),Math.tan(dec)*Math.cos(la)-Math.sin(la)*Math.cos(ha));
+  return {alt:alt/rad, az:az/rad, lon:L};
+}
+const TERMS=["春分","清明","穀雨","立夏","小滿","芒種","夏至","小暑","大暑","立秋","處暑","白露","秋分","寒露","霜降","立冬","小雪","大雪","冬至","小寒","大寒","立春","雨水","驚蟄"];
+function twParts(ms){ // Taiwan UTC+8
+  const t=new Date(ms+8*3600000);
+  return {y:t.getUTCFullYear(),m:t.getUTCMonth()+1,d:t.getUTCDate(),h:t.getUTCHours(),mi:t.getUTCMinutes(),s:t.getUTCSeconds(),wd:t.getUTCDay()};
+}
+const pad=n=>String(n).padStart(2,"0");
+function riseSet(ms){
+  const p=twParts(ms); const start=Date.UTC(p.y,p.m-1,p.d)-8*3600000;
+  let rise=null,set=null,prev=sunAt(start).alt;
+  for(let t=start+120000;t<=start+86400000;t+=120000){
+    const a=sunAt(t).alt;
+    if(prev<-0.833&&a>=-0.833&&!rise)rise=t;
+    if(prev>=-0.833&&a<-0.833)set=t;
+    prev=a;
+  }
+  const f=x=>{if(!x)return"--:--";const q=twParts(x);return pad(q.h)+":"+pad(q.mi)};
+  return f(rise)+" / "+f(set);
+}
+function nextTerm(ms){
+  const idx=Math.floor(sunAt(ms).lon/15);
+  for(let t=ms;t<ms+20*86400000;t+=3600000){
+    const i=Math.floor(sunAt(t).lon/15);
+    if(i!==idx){const q=twParts(t);return {name:TERMS[i%24],m:q.m,d:q.d}}
+  }
+  return null;
+}
+function moonPhase(ms){
+  const syn=29.530588853, age=(((ms-947182440000)/86400000)%syn+syn)%syn;
+  const names=["新月","眉月","上弦月","盈凸月","滿月","虧凸月","下弦月","殘月"];
+  return {age, name:names[Math.floor(((age/syn)*8)+0.5)%8]};
+}
+
+/* ---------------- content ---------------- */
+const ISLES=[
+ {id:"museum", short:"文學館", place:"臺南 · 中西區", title:"國立臺灣文學館", sub:"群島的中央港口",
+  pos:[0,0,0], r:6.2, color:0x8fb36a,
+  text:["國立臺灣文學館於 2003 年開館，館舍是 1916 年落成的日治時期臺南州廳，紅磚外牆與屋頂穹頂出自建築師森山松之助之手。",
+        "這座島是整個群島的出發點。從這裡架起的繩橋，通往北門郡沿海的五座小島：佳里、北門、七股、南鯤鯓，以及戰後接棒的台語文學。"],
+  people:["館藏手稿","地方文學研究","線上特展"],
+  timeline:[["1916","臺南州廳落成"],["2003","國立臺灣文學館開館"]],
+  now:t=>museumStatus(t)},
+ {id:"jiali", short:"佳里", place:"佳里 · 琑琅山房", title:"吳新榮與佳里支部", sub:"鹽分地帶派的起點",
+  pos:[-15,2.5,-6], r:4.6, color:0x9fbf6e,
+  text:["吳新榮（1907–1967）留學日本習醫，返鄉後在佳里行醫，書房名為「琑琅山房」。白天看診，夜裡讀書寫作，也長年寫日記，為地方留下大量第一手紀錄。",
+        "1933 年他與郭水潭等青年組成「佳里青風會」；1935 年進一步成立「臺灣文藝聯盟佳里支部」。這群以佳里為中心的寫作者，後來被稱為「鹽分地帶派」。"],
+  people:["吳新榮","郭水潭","徐清吉","林芳年","莊培初"],
+  timeline:[["1933","佳里青風會成立"],["1935","臺灣文藝聯盟佳里支部成立"]],
+  now:t=>{const p=twParts(t);return `距佳里支部成立已 ${p.y-1935} 年。琑琅山房的燈：${sunAt(t).alt<-3?"已經點亮，正是夜讀時分":"白天熄著，醫師在看診"}。`}},
+ {id:"beimen", short:"北門", place:"北門 · 瓦盤鹽田", title:"鹽分地帶之名", sub:"鹹地上長出的文學",
+  pos:[-8,-1.5,13], r:5.0, color:0xc9c08a,
+  text:["日治時期的北門郡涵蓋北門、將軍、七股、學甲、西港、佳里六個鄉鎮。沿海土地鹹鹼，田少鹽田多，「鹽分地帶」因此得名，後來也成了這群作家的稱號。",
+        "島上的格子是瓦盤鹽田：以碎陶片鋪底，引海水日曬結晶。曬鹽靠天吃飯，也成為作家筆下勞動、貧瘠與堅韌的象徵。常被並稱的「北門七子」，就生活在這片土地上。"],
+  people:["吳新榮","郭水潭","王登山","徐清吉","林芳年","莊培初","林精鏐"],
+  timeline:[["北門郡","六鄉鎮：北門、將軍、七股、學甲、西港、佳里"]],
+  now:t=>saltNow(t)},
+ {id:"qigu", short:"七股", place:"七股 · 鹽山與潟湖", title:"鹽的意象", sub:"白色山丘與黑面琵鷺",
+  pos:[11,3.5,12], r:4.8, color:0xa7c38a,
+  text:["七股鹽山是曬鹽年代留下的白色地標。臺灣的日曬鹽業在 2002 年走入歷史，鹽田轉為濕地，潟湖則成為黑面琵鷺每年南下度冬的地方。",
+        "在鹽分地帶的詩裡，鹽常被寫成土地與人的自畫像：卑微、粗糙，卻結晶發光。林佛兒 1982 年的詩作〈鹽分地帶〉，正是以鹽粒自喻這片土地上的人。"],
+  people:["林佛兒","鹽田","潟湖","黑面琵鷺"],
+  timeline:[["1982","林佛兒〈鹽分地帶〉"],["2002","臺灣日曬鹽業停產"]],
+  now:t=>spoonbill(t)},
+ {id:"nankunshen", short:"南鯤鯓", place:"北門 · 南鯤鯓代天府", title:"鹽分地帶文藝營", sub:"在廟埕旁傳下去的火",
+  pos:[15,-2,-7], r:4.7, color:0x9cb87a,
+  text:["1979 年，第一屆「鹽分地帶文藝營」在南鯤鯓代天府的香客大樓舉行。從此夏天的海邊多了一群帶著筆記本的年輕人。",
+        "文藝營讓前輩作家與學生面對面，把日治時期佳里青年聚會寫作的傳統，接到了戰後的世代手上。"],
+  people:["文藝營","青年寫作者","代天府"],
+  timeline:[["1979","第一屆鹽分地帶文藝營"]],
+  now:t=>{const p=twParts(t);return `第一屆文藝營至今 ${p.y-1979} 年。現在廟埕：${sunAt(t).alt>0?"日光下香火正旺":"夜色中燈籠點亮"}。`}},
+ {id:"taigi", short:"台語文學", place:"戰後 · 鹽分地帶", title:"戰後接棒與台語文學", sub:"翻開下一頁的島",
+  pos:[1,5,-17], r:4.4, color:0xb1c47c,
+  text:["戰後，鹽分地帶的寫作沒有中斷。黃勁連、羊子喬、杜文靖等新一代作家延續前輩的關懷，並成立臺灣筆會鹽分地帶分會。",
+        "其中最鮮明的發展是台語文學：用土地上的語言寫土地，讓「鹹地」的聲音直接上紙。學者以「南方文藝復興」形容這段歷程。"],
+  people:["黃勁連","羊子喬","林佛兒","杜文靖"],
+  timeline:[["戰後","臺灣筆會鹽分地帶分會成立"],["今日","台語詩文持續創作"]],
+  now:t=>`書頁正隨風翻動。今天的節氣是「${TERMS[Math.floor(sunAt(t).lon/15)]}」，不妨用台語念一首詩。`}
+];
+/* ---- 代表作品（草稿，待臺灣文學館審訂）----
+   館方審訂後：把 review 改成 {by:"國立臺灣文學館", date:"2026-11-15"}，
+   並依審訂版本修改 card（介紹卡）與 line（琵琵台詞）。review 為 null 時顯示「待審訂草稿」。 */
+const WORKS={
+ museum:[
+  {title:"《吳新榮日記全集》",author:"吳新榮",year:"2007 年出版",review:null,
+   card:"吳新榮從青年時期起長年寫日記，記下行醫、寫作、家庭與地方上的大小事。國立臺灣文學館於 2007 年整理出版《吳新榮日記全集》，讓這份私人紀錄成為研究日治到戰後南臺灣社會的重要史料。",
+   line:"作品時間！文學館在 2007 年整理出版了《吳新榮日記全集》。吳醫師寫了幾十年的日記，讓我們看見那個年代南臺灣的日常生活。",
+   src:[["Wu Hsin-jung（Wikipedia）","https://en.wikipedia.org/wiki/Wu_Hsin-jung"]]}],
+ jiali:[
+  {title:"《琑琅山房隨筆》",author:"吳新榮",year:"1958–1965 撰寫",review:null,
+   card:"吳新榮晚年以書房為名寫下的隨筆，前後寫了約十年。篇章有記事、詠物、說理，也有諷刺，語氣平和淡雅，字裡行間卻藏著難以明說的心事。後收入 1981 年遠景出版的《吳新榮全集》。",
+   line:"作品時間！《琑琅山房隨筆》是吳醫師晚年在書房寫的短文。有的記事，有的講道理，讀起來很平和，字裡行間卻藏著他的心事。",
+   src:[["吳新榮《琑琅山房隨筆》析論","https://paradisic.org/memorial-activites/2015-activites/2015-01-21-2/01-21/"]]},
+  {title:"〈某男人的手記〉",author:"郭水潭",year:"1935",review:null,
+   card:"郭水潭（1908–1995）是佳里人，以日文創作。這篇以日記體寫成的自傳性小說，1935 年獲《大阪每日新聞》新人獎項肯定，是他小說方面的代表作。",
+   line:"",
+   src:[["Kuo Shui-t'an（Wikipedia）","https://en.wikipedia.org/wiki/Kuo_Shui-t%27an"]]}],
+ beimen:[
+  {title:"《偽リなき告白》（無偽的告白）",author:"王登山",year:"約 1931–1940 創作",review:null,
+   card:"北門詩人王登山把 18 到 27 歲間寫的詩與小品文，親手抄成一冊手稿，取名「無偽的告白」。內容寫青年時期的苦悶、流浪與對文學的執著，也一再回到他出身的鹽村。手稿後由呂興昌教授整理翻譯。",
+   line:"作品時間！北門詩人王登山，把年輕時寫的詩抄成一本手稿，叫做《無偽的告白》。裡面寫苦悶、寫流浪，也一直寫回他的鹽村老家。",
+   src:[["臺灣文學虛擬博物館：王登山《偽リなき告白》","https://tlvm.nmtl.gov.tw/zh/Create/CreatePlatformCont?Createid=198"]]},
+  {title:"〈向棺木慟哭〉",author:"郭水潭",year:"1939",review:null,
+   card:"郭水潭為悼念早逝的次子寫下的日文詩，以父親的悲痛直面死亡。作家龍瑛宗曾稱它為該年最動人的作品，是鹽分地帶詩作中情感最深刻的篇章之一。",
+   line:"",
+   src:[["Kuo Shui-t'an（Wikipedia）","https://en.wikipedia.org/wiki/Kuo_Shui-t%27an"]]}],
+ qigu:[
+  {title:"〈鹽分地帶〉",author:"林佛兒",year:"1982",review:null,
+   card:"佳里人林佛兒 19 歲出版詩集《芒果園》，後來創辦林白出版社與《推理》雜誌，晚年擔任《鹽分地帶文學》雙月刊總編輯。這首〈鹽分地帶〉把土地上的人比作鹽粒：粗糙、卑微，卻堅持在貧瘠中發光。",
+   line:"作品時間！佳里詩人林佛兒在 1982 年寫了〈鹽分地帶〉。他把這裡的人比作一顆顆鹽，粗粗的、小小的，卻會在貧瘠的土地上發光。",
+   src:[["鹽鄉采風（udn 部落格）","https://blog.udn.com/mellisa0508/5923498"],["中時新聞網：林佛兒辭世","https://www.chinatimes.com/realtimenews/20170405005192-260405"]]}],
+ nankunshen:[
+  {title:"《南鯤鯓代天府沿革志》",author:"吳新榮",year:"年份待查",review:null,
+   card:"戰後吳新榮投入地方文史，參與《台南縣志稿》、編輯《南瀛文獻》，也為南鯤鯓代天府編寫沿革志，把廟宇的歷史記錄下來。文學家為地方寫史，也是鹽分地帶的傳統。",
+   line:"作品時間！吳醫師後來也成了地方文史專家，還替南鯤鯓代天府寫過一本沿革志，把這座廟的故事好好記了下來。",
+   src:[["Wu Hsin-jung（Wikipedia）","https://en.wikipedia.org/wiki/Wu_Hsin-jung"]]}],
+ taigi:[
+  {title:"《海翁台語文學》",author:"黃勁連 主編",year:"雜誌（持續發行）",review:null,
+   card:"黃勁連 1946 年生於佳里潭仔墘，被稱為南臺灣台語文學運動的「火車頭」。1991 年後專心台語寫作與研究，曾任《台灣文藝》總編輯，並主編《海翁台語文學》，也編選台語童謠、褒歌等書，讓台語文學代代相傳。",
+   line:"作品時間！佳里出身的黃勁連，是南臺灣台語文學的火車頭。他主編《海翁台語文學》雜誌，讓更多人用台語寫詩、寫故事。",
+   src:[["黃勁連（中文百科）","https://www.newton.com.tw/wiki/%E9%BB%83%E5%8B%81%E9%80%A3"]]}]
+};
+const badge=w=>w.review?`<span class="wk-badge ok">${w.review.by}審訂 · ${w.review.date}</span>`:`<span class="wk-badge">待審訂草稿</span>`;
+function worksHTML(id){
+  const ws=WORKS[id]||[];if(!ws.length)return"";
+  return `<div class="h3">代表作品</div><div class="works">`+ws.map(w=>`<article class="wk">
+    <div class="wk-top"><h4>${w.title}</h4>${badge(w)}</div>
+    <div class="wk-meta">${w.author} · ${w.year}</div>
+    <p>${w.card}</p>
+    ${w.review?"":`<div class="wk-src">草稿依據：${w.src.map(([n,u])=>`<a href="${u}" target="_blank" rel="noopener">${n}</a>`).join("、")}</div>`}
+  </article>`).join("")+`</div>`;
+}
+function museumStatus(t){
+  const p=twParts(t), mins=p.h*60+p.mi;
+  if(p.wd===1) return "今天週一，依例為休館日（實際開放時間以文學館官網公告為準）。";
+  return mins>=540&&mins<1080 ? `開館中，距離 18:00 閉館還有 ${Math.floor((1080-mins)/60)} 小時 ${(1080-mins)%60} 分。（以官網公告為準）`
+       : "目前為閉館時段，開館時間 09:00–18:00。（以官網公告為準）";
+}
+function saltNow(t){
+  const a=sunAt(t).alt;
+  if(a<=0) return "太陽已下山，鹽田停止蒸發。鹽工收起木耙，等待明天的日頭。";
+  const lvl=a>50?"強烈":a>30?"充足":a>12?"中等":"微弱";
+  return `太陽高度 ${a.toFixed(0)}°，日照${lvl}。${a>30?"正是結晶最快的時候。":"鹽水正慢慢濃縮。"}`;
+}
+function spoonbill(t){
+  const m=twParts(t).m;
+  return (m>=10||m<=4) ? `現在是 ${m} 月，正值黑面琵鷺度冬季（約 10 月到隔年 4 月），潟湖上可以看見牠們。`
+       : `現在是 ${m} 月，黑面琵鷺多已北返，要等到 10 月才會再回到七股。`;
+}
+
+/* ---------------- three.js scene ---------------- */
+const canvas=document.getElementById("stage");
+if(!window.THREE){document.getElementById("loader").textContent="3D 元件載入失敗，請重新整理頁面。";return;}
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.outputEncoding=THREE.sRGBEncoding;
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(42,1,0.1,400);
+camera.position.set(34,26,40);
+const controls=new THREE.OrbitControls(camera,canvas);
+controls.enableDamping=true; controls.dampingFactor=0.07;
+controls.minDistance=10; controls.maxDistance=90; controls.maxPolarAngle=Math.PI*0.53;
+controls.target.set(0,0,0); controls.autoRotate=!reduce; controls.autoRotateSpeed=0.35;
+
+// sky dome
+const skyU={top:{value:new THREE.Color()},mid:{value:new THREE.Color()},bot:{value:new THREE.Color()}};
+const sky=new THREE.Mesh(new THREE.SphereGeometry(200,32,16),new THREE.ShaderMaterial({
+  side:THREE.BackSide,depthWrite:false,uniforms:skyU,
+  vertexShader:"varying vec3 vP;void main(){vP=normalize(position);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}",
+  fragmentShader:"uniform vec3 top,mid,bot;varying vec3 vP;void main(){float h=vP.y;vec3 c=h>0.?mix(mid,top,smoothstep(0.,.6,h)):mix(mid,bot,smoothstep(0.,-.4,h));gl_FragColor=vec4(c,1.);}"
+}));
+scene.add(sky);
+scene.fog=new THREE.Fog(0xffffff,60,170);
+
+const hemi=new THREE.HemisphereLight(0xffffff,0xe8d7b8,0.6); scene.add(hemi);
+const sun=new THREE.DirectionalLight(0xffffff,1); sun.castShadow=true;
+sun.shadow.mapSize.set(2048,2048);
+Object.assign(sun.shadow.camera,{left:-32,right:32,top:32,bottom:-32,near:1,far:140});
+sun.shadow.bias=-0.0006; sun.shadow.radius=4;
+scene.add(sun); scene.add(sun.target);
+
+// sun / moon discs
+const sunDisc=new THREE.Mesh(new THREE.SphereGeometry(4,24,12),new THREE.MeshBasicMaterial({color:0xfff1c4,fog:false}));
+const moonDisc=new THREE.Mesh(new THREE.SphereGeometry(2.6,24,12),new THREE.MeshBasicMaterial({color:0xf4f1e6,fog:false}));
+scene.add(sunDisc,moonDisc);
+
+// stars
+const starGeo=new THREE.BufferGeometry(); const sp=[];
+for(let i=0;i<500;i++){const u=Math.random()*Math.PI*2,v=Math.random()*0.5+0.05;sp.push(180*Math.cos(u)*Math.cos(v*Math.PI/2),180*Math.sin(v*Math.PI/2),180*Math.sin(u)*Math.cos(v*Math.PI/2));}
+starGeo.setAttribute("position",new THREE.Float32BufferAttribute(sp,3));
+const starMat=new THREE.PointsMaterial({color:0xffffff,size:0.9,transparent:true,opacity:0,fog:false});
+scene.add(new THREE.Points(starGeo,starMat));
+
+/* helpers */
+function rnd(seed){let s=seed;return()=>{s=(s*16807)%2147483647;return(s-1)/2147483646}}
+const M=(c,o={})=>new THREE.MeshStandardMaterial(Object.assign({color:c,roughness:0.92,metalness:0,flatShading:true},o));
+function mesh(g,m,cast=true,recv=true){const x=new THREE.Mesh(g,m);x.castShadow=cast;x.receiveShadow=recv;return x}
+const lampMats=[];
+
+function islandBase(r,depth,grass,seed){
+  const R=rnd(seed), g=new THREE.Group();
+  // grass top
+  const top=new THREE.CylinderGeometry(r,r*0.96,0.7,28,1);
+  const p=top.attributes.position;
+  for(let i=0;i<p.count;i++){const x=p.getX(i),z=p.getZ(i),a=Math.atan2(z,x);
+    const k=1+0.07*Math.sin(a*3+seed)+0.05*Math.sin(a*5+seed*2);p.setX(i,x*k);p.setZ(i,z*k);}
+  top.computeVertexNormals();
+  const t=mesh(top,M(grass)); t.position.y=0.35; g.add(t);
+  // soil band
+  const soil=top.clone(); soil.scale(1.01,0.9,1.01);
+  const s=mesh(soil,M(0xb88a5c)); s.position.y=-0.25; g.add(s);
+  // rocky underside
+  const cone=new THREE.ConeGeometry(r*0.98,depth,22,5);
+  const cp=cone.attributes.position;
+  for(let i=0;i<cp.count;i++){const y=cp.getY(i);if(y<depth/2-0.01){
+      const x=cp.getX(i),z=cp.getZ(i),a=Math.atan2(z,x),n=0.82+0.3*R();
+      const k=n*(1+0.08*Math.sin(a*3+seed));cp.setX(i,x*k);cp.setZ(i,z*k);cp.setY(i,y+(R()-0.5)*0.5);}}
+  cone.computeVertexNormals();
+  const c=mesh(cone,M(0x9a7458)); c.rotation.x=Math.PI; c.position.y=-0.6-depth/2; g.add(c);
+  // dangling roots/crystals of salt
+  for(let i=0;i<5;i++){const a=R()*Math.PI*2,rr=r*0.5*R();
+    const cr=mesh(new THREE.OctahedronGeometry(0.35+R()*0.3,0),M(0xeef3f4,{roughness:0.4}));
+    cr.position.set(Math.cos(a)*rr,-depth*0.7-R()*depth*0.3,Math.sin(a)*rr);g.add(cr);}
+  return g;
+}
+function tree(h=1,col=0x6f9a4a){
+  const g=new THREE.Group();
+  const tr=mesh(new THREE.CylinderGeometry(0.08,0.12,0.7*h,6),M(0x7a5236));tr.position.y=0.35*h;g.add(tr);
+  const cr=mesh(new THREE.IcosahedronGeometry(0.55*h,0),M(col));cr.position.y=0.95*h;cr.scale.y=1.15;g.add(cr);
+  return g;
+}
+function palm(){
+  const g=new THREE.Group();
+  const tr=mesh(new THREE.CylinderGeometry(0.06,0.1,1.6,6),M(0x8a6a48));tr.position.y=0.8;tr.rotation.z=0.12;g.add(tr);
+  for(let i=0;i<6;i++){const l=mesh(new THREE.ConeGeometry(0.16,1.1,4),M(0x5f8f3e));
+    l.position.set(Math.cos(i)*0.35+0.1,1.55,Math.sin(i)*0.35);l.rotation.set(Math.sin(i)*1.2,0,Math.PI/2+Math.cos(i)*1.2);g.add(l);}
+  return g;
+}
+function house(w,d,h,wall,roof,lit=true){
+  const g=new THREE.Group();
+  const b=mesh(new THREE.BoxGeometry(w,h,d),M(wall));b.position.y=h/2;g.add(b);
+  const rf=mesh(new THREE.ConeGeometry(Math.max(w,d)*0.78,h*0.7,4),M(roof));rf.position.y=h+h*0.35;rf.rotation.y=Math.PI/4;rf.scale.set(w/Math.max(w,d),1,d/Math.max(w,d));g.add(rf);
+  if(lit){const wm=new THREE.MeshStandardMaterial({color:0x4b3a2c,emissive:0xffb24a,emissiveIntensity:0,flatShading:true});
+    lampMats.push(wm);
+    for(const sx of [-0.25,0.25]){const win=mesh(new THREE.BoxGeometry(w*0.18,h*0.3,0.04),wm,false,false);win.position.set(sx*w,h*0.55,d/2+0.02);g.add(win);}}
+  return g;
+}
+function lantern(){
+  const m=new THREE.MeshStandardMaterial({color:0xd94a33,emissive:0xff6a3a,emissiveIntensity:0,flatShading:true});
+  lampMats.push(m);
+  const l=mesh(new THREE.SphereGeometry(0.16,8,6),m,false,false);l.scale.y=1.3;return l;
+}
+function pond(r,col=0x4b8f9a){
+  const m=mesh(new THREE.CircleGeometry(r,24),M(col,{roughness:0.25,metalness:0.1}),false,true);
+  m.rotation.x=-Math.PI/2;return m;
+}
+
+/* ---- build islands ---- */
+const islandObjs=[], animated=[];
+const isleGroup=new THREE.Group(); scene.add(isleGroup);
+
+ISLES.forEach((d,idx)=>{
+  const g=new THREE.Group(); g.position.set(...d.pos);
+  const base=islandBase(d.r,d.r*1.5,d.color,idx+3); g.add(base);
+  const top=0.7; const R=rnd(idx*17+5);
+  const scatterTrees=(n,minR,maxR,fn=tree)=>{for(let i=0;i<n;i++){const a=R()*Math.PI*2,rr=minR+R()*(maxR-minR);const t=fn(0.7+R()*0.6);t.position.set(Math.cos(a)*rr,top,Math.sin(a)*rr);t.rotation.y=R()*6;g.add(t);}};
+
+  if(d.id==="museum"){
+    // 臺南州廳 inspired: brick body, white trim bands, mansard + dome
+    const B=new THREE.Group(); B.position.y=top;
+    const brick=M(0xb5543a), trim=M(0xf2ead9), slate=M(0x4f5a63);
+    const body=mesh(new THREE.BoxGeometry(6,1.8,2.6),brick);body.position.y=0.9;B.add(body);
+    for(const y of [0.05,1.0,1.8]){const t=mesh(new THREE.BoxGeometry(6.1,0.12,2.7),trim);t.position.y=y;B.add(t);}
+    const wings=[[-3.6,0],[3.6,0]];wings.forEach(([x])=>{const w=mesh(new THREE.BoxGeometry(1.4,2.1,3),brick);w.position.set(x,1.05,0);B.add(w);
+      const r=mesh(new THREE.BoxGeometry(1.5,0.5,3.1),slate);r.position.set(x,2.35,0);B.add(r);});
+    const roof=mesh(new THREE.BoxGeometry(5.8,0.5,2.4),slate);roof.position.y=2.1;B.add(roof);
+    const drum=mesh(new THREE.CylinderGeometry(0.9,0.9,0.8,16),trim);drum.position.y=2.7;B.add(drum);
+    const dome=mesh(new THREE.SphereGeometry(0.95,16,8,0,Math.PI*2,0,Math.PI/2),slate);dome.position.y=3.1;B.add(dome);
+    const spire=mesh(new THREE.ConeGeometry(0.12,0.7,6),trim);spire.position.y=4.3;B.add(spire);
+    // windows (lit)
+    const wm=new THREE.MeshStandardMaterial({color:0x3c3028,emissive:0xffc070,emissiveIntensity:0,flatShading:true});lampMats.push(wm);
+    for(let i=-2;i<=2;i++){for(const y of [0.5,1.4]){const w=mesh(new THREE.BoxGeometry(0.4,0.5,0.05),wm,false,false);w.position.set(i*1.1,y,1.33);B.add(w);}}
+    // portico
+    for(let i=-1;i<=1;i+=2){const c=mesh(new THREE.CylinderGeometry(0.1,0.1,1.7,8),trim);c.position.set(i*0.5,0.85,1.6);B.add(c);}
+    const ped=mesh(new THREE.BoxGeometry(1.5,0.3,0.6),trim);ped.position.set(0,1.85,1.6);B.add(ped);
+    B.position.z=-0.8;g.add(B);
+    // plaza + trees + books stack
+    const plaza=mesh(new THREE.CylinderGeometry(2.2,2.2,0.06,24),M(0xe6d7bb));plaza.position.set(0,top+0.03,2.6);g.add(plaza);
+    scatterTrees(7,4.4,5.4);
+    const books=new THREE.Group();[0x9a3b2e,0x3f6b72,0xd9b85c].forEach((c,i)=>{const b=mesh(new THREE.BoxGeometry(0.9,0.18,0.65),M(c));b.position.y=0.09+i*0.18;b.rotation.y=i*0.3;books.add(b)});
+    books.position.set(0,top,2.6);g.add(books);
+  }
+  if(d.id==="jiali"){
+    const h=house(2.2,1.6,1.1,0xf0e4cc,0x8a3b2b);h.position.set(-0.6,top,-0.4);g.add(h);
+    const h2=house(1.2,1,0.8,0xe8d9bc,0x9a4a35);h2.position.set(1.6,top,-1.4);h2.rotation.y=0.4;g.add(h2);
+    // clinic sign / study: small desk with paper
+    const desk=mesh(new THREE.BoxGeometry(0.8,0.4,0.5),M(0x7a5236));desk.position.set(1.2,top+0.2,1.2);g.add(desk);
+    const paper=mesh(new THREE.BoxGeometry(0.45,0.02,0.32),M(0xfdf8ee));paper.position.set(1.2,top+0.42,1.2);g.add(paper);
+    scatterTrees(8,2.6,4.0);
+    const l=lantern();l.position.set(0.5,top+1.2,0.6);g.add(l);
+    // long-path
+    const path=mesh(new THREE.BoxGeometry(0.5,0.04,3),M(0xd8c39c));path.position.set(-0.6,top+0.02,1.6);g.add(path);
+  }
+  if(d.id==="beimen"){
+    // 瓦盤鹽田 grid
+    const tileM=M(0x9bb2b5,{roughness:0.35}), ridge=M(0xd2b98d);
+    for(let x=-3;x<=2;x++)for(let z=-2;z<=2;z++){
+      if(Math.hypot(x+0.5,z)>3.3)continue;
+      const t=mesh(new THREE.BoxGeometry(1.0,0.06,1.0),tileM,false,true);t.position.set(x*1.1+0.5,top+0.03,z*1.1);g.add(t);
+      if(R()>0.55){const pile=mesh(new THREE.ConeGeometry(0.22,0.32,7),M(0xf7f9fa,{roughness:0.6}));pile.position.set(x*1.1+0.5,top+0.2,z*1.1);g.add(pile);}
+    }
+    for(let i=-3;i<=3;i++){const r=mesh(new THREE.BoxGeometry(7,0.1,0.08),ridge);r.position.set(0,top+0.05,i*1.1-0.55);g.add(r);}
+    const hut=house(1.2,1,0.8,0xe7dcc6,0x6b5446);hut.position.set(-3.2,top,2.2);hut.rotation.y=0.6;g.add(hut);
+    // salt worker with rake
+    const wk=new THREE.Group();const bd=mesh(new THREE.CylinderGeometry(0.1,0.13,0.45,6),M(0x3f6b72));bd.position.y=0.22;wk.add(bd);
+    const hd=mesh(new THREE.SphereGeometry(0.1,8,6),M(0xe5c39c));hd.position.y=0.55;wk.add(hd);
+    const hat=mesh(new THREE.ConeGeometry(0.2,0.14,10),M(0xd9c07a));hat.position.y=0.66;wk.add(hat);
+    const rake=mesh(new THREE.CylinderGeometry(0.015,0.015,0.9,4),M(0x7a5236));rake.position.set(0.15,0.4,0.1);rake.rotation.z=0.7;wk.add(rake);
+    wk.position.set(1.2,top+0.06,0.6);g.add(wk);animated.push({o:wk,type:"worker",b:wk.position.clone()});
+    // windmill pump
+    const pole=mesh(new THREE.CylinderGeometry(0.05,0.07,1.8,6),M(0x7a5236));pole.position.set(3.2,top+0.9,-1.6);g.add(pole);
+    const blades=new THREE.Group();for(let i=0;i<4;i++){const b=mesh(new THREE.BoxGeometry(0.08,0.8,0.02),M(0xf2ead9));b.position.y=0.4;const piv=new THREE.Group();piv.rotation.z=i*Math.PI/2;piv.add(b);blades.add(piv);}
+    blades.position.set(3.2,top+1.8,-1.5);g.add(blades);animated.push({o:blades,type:"spin"});
+  }
+  if(d.id==="qigu"){
+    const mt=new THREE.ConeGeometry(2.3,2.6,14,4);const mp=mt.attributes.position;
+    for(let i=0;i<mp.count;i++){if(mp.getY(i)<1.29){mp.setX(i,mp.getX(i)*(0.9+R()*0.18));mp.setZ(i,mp.getZ(i)*(0.9+R()*0.18));}}
+    mt.computeVertexNormals();
+    const m=mesh(mt,M(0xf7f9fa,{roughness:0.7}));m.position.set(-1,top+1.3,-0.8);g.add(m);
+    // stairs on salt mountain
+    for(let i=0;i<7;i++){const s=mesh(new THREE.BoxGeometry(0.35,0.06,0.2),M(0xb88a5c));s.position.set(-1+0.15*i,top+0.2+i*0.33,-0.8+1.9-i*0.25);g.add(s);}
+    const lag=pond(1.9);lag.position.set(1.9,top+0.03,1.4);g.add(lag);
+    // spoonbills
+    for(let i=0;i<4;i++){const b=new THREE.Group();
+      const bd=mesh(new THREE.SphereGeometry(0.16,8,6),M(0xffffff));bd.scale.set(1.4,0.9,0.9);bd.position.y=0.28;b.add(bd);
+      const nk=mesh(new THREE.CylinderGeometry(0.03,0.04,0.22,5),M(0xffffff));nk.position.set(0.18,0.42,0);nk.rotation.z=-0.5;b.add(nk);
+      const bl=mesh(new THREE.BoxGeometry(0.22,0.03,0.06),M(0x1d1d1d));bl.position.set(0.36,0.5,0);bl.rotation.z=-0.35;b.add(bl);
+      const lg=mesh(new THREE.CylinderGeometry(0.015,0.015,0.22,4),M(0x222222));lg.position.y=0.1;b.add(lg);
+      b.position.set(1.4+R()*1.3,top+0.03,0.7+R()*1.4);b.rotation.y=R()*6;g.add(b);animated.push({o:b,type:"bird",seed:R()*10});
+      b.userData.spoon=true;}
+    scatterTrees(5,3.4,4.2,palm);
+  }
+  if(d.id==="nankunshen"){
+    const T=new THREE.Group();T.position.set(0,top,-0.6);
+    const base=mesh(new THREE.BoxGeometry(3.2,0.3,2.2),M(0xd8c39c));base.position.y=0.15;T.add(base);
+    const hall=mesh(new THREE.BoxGeometry(2.6,1.0,1.6),M(0xc8513b));hall.position.y=0.8;T.add(hall);
+    const roofM=M(0xe0913a);
+    const r1=mesh(new THREE.BoxGeometry(3.2,0.18,2.1),roofM);r1.position.y=1.4;T.add(r1);
+    const r2=mesh(new THREE.BoxGeometry(2.2,0.5,1.4),M(0xc8513b));r2.position.y=1.75;T.add(r2);
+    const r3=mesh(new THREE.BoxGeometry(2.7,0.16,1.7),roofM);r3.position.y=2.05;T.add(r3);
+    for(const sx of [-1,1]){const sw=mesh(new THREE.ConeGeometry(0.14,0.7,4),roofM);sw.position.set(sx*1.45,2.25,0);sw.rotation.z=-sx*0.9;T.add(sw);
+      const sw2=sw.clone();sw2.position.y=1.6;sw2.position.x=sx*1.7;T.add(sw2);}
+    const pearl=mesh(new THREE.SphereGeometry(0.14,10,8),M(0xf1c34e,{roughness:0.4}));pearl.position.y=2.3;T.add(pearl);
+    g.add(T);
+    for(let i=-2;i<=2;i++){const l=lantern();l.position.set(i*0.55,top+1.15,0.38);g.add(l);animated.push({o:l,type:"sway",seed:i});}
+    // courtyard with tents of the literary camp
+    for(let i=0;i<3;i++){const tent=mesh(new THREE.ConeGeometry(0.55,0.7,4),M([0xf2ead9,0x3f7f8c,0xd9b85c][i]));tent.position.set(-1.4+i*1.4,top+0.35,2.2);tent.rotation.y=Math.PI/4;g.add(tent);}
+    scatterTrees(5,3.3,4.1);
+  }
+  if(d.id==="taigi"){
+    // giant open book
+    const book=new THREE.Group();book.position.set(0,top+0.1,0);
+    const cover=M(0x3f6b72);
+    for(const sx of [-1,1]){const c=mesh(new THREE.BoxGeometry(2,0.08,2.6),cover);c.position.set(sx*1.02,0.1,0);c.rotation.z=sx*0.12;book.add(c);
+      const pg=mesh(new THREE.BoxGeometry(1.85,0.22,2.45),M(0xfbf6ec));pg.position.set(sx*0.98,0.26,0);pg.rotation.z=sx*0.12;book.add(pg);
+      for(let k=0;k<5;k++){const ln=mesh(new THREE.BoxGeometry(1.2,0.01,0.06),M(0x6b5a4a),false,false);ln.position.set(sx*1.0,0.39+sx*0.0,-0.8+k*0.4);ln.rotation.z=sx*0.12;book.add(ln);}}
+    g.add(book);
+    // flipping page
+    const pivot=new THREE.Group();pivot.position.set(0,top+0.42,0);
+    const page=mesh(new THREE.BoxGeometry(1.8,0.02,2.4),M(0xfffdf6),true,false);page.position.x=0.92;pivot.add(page);
+    g.add(pivot);animated.push({o:pivot,type:"page"});
+    const h=house(1.0,0.9,0.7,0xeee0c2,0x8a3b2b);h.position.set(-2.6,top,-1.8);g.add(h);
+    const l=lantern();l.position.set(2.3,top+1.0,-1.6);g.add(l);
+    const post=mesh(new THREE.CylinderGeometry(0.04,0.04,1,6),M(0x7a5236));post.position.set(2.3,top+0.5,-1.6);g.add(post);
+    scatterTrees(5,3.0,3.8);
+  }
+  g.userData={id:d.id,idx,baseY:d.pos[1],phase:idx*1.3};
+  g.traverse(o=>{if(o.isMesh)o.userData.isle=idx;});
+  isleGroup.add(g); islandObjs.push(g);
+});
+
+/* rope bridges from museum to each island */
+const ropeM=new THREE.MeshStandardMaterial({color:0x8a6a48,roughness:1});
+const plankM=M(0xc49a6c);
+for(let i=1;i<ISLES.length;i++){
+  const a=new THREE.Vector3(0,0.75,0), b=new THREE.Vector3(...ISLES[i].pos).add(new THREE.Vector3(0,0.75,0));
+  const dir=b.clone().sub(a).setY(0).normalize();
+  const A=a.clone().add(dir.clone().multiplyScalar(ISLES[0].r*0.95));
+  const B=b.clone().sub(dir.clone().multiplyScalar(ISLES[i].r*0.92));
+  const mid=A.clone().lerp(B,0.5); mid.y-=1.6;
+  const curve=new THREE.QuadraticBezierCurve3(A,mid,B);
+  const side=new THREE.Vector3(-dir.z,0,dir.x).multiplyScalar(0.28);
+  for(const s of [1,-1]){const c2=new THREE.QuadraticBezierCurve3(A.clone().add(side.clone().multiplyScalar(s)).setY(A.y+0.4),mid.clone().add(side.clone().multiplyScalar(s)).setY(mid.y+0.4),B.clone().add(side.clone().multiplyScalar(s)).setY(B.y+0.4));
+    scene.add(mesh(new THREE.TubeGeometry(c2,24,0.025,4),ropeM,false,false));}
+  const n=Math.floor(A.distanceTo(B)/0.42);
+  for(let k=1;k<n;k++){const p=curve.getPoint(k/n),tg=curve.getTangent(k/n);
+    const pl=mesh(new THREE.BoxGeometry(0.62,0.04,0.2),plankM,true,false);pl.position.copy(p);
+    pl.lookAt(p.clone().add(tg));pl.rotateY(Math.PI/2);pl.rotation.order="YXZ";
+    const q=new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,0,1),tg.clone().normalize());pl.quaternion.copy(q);
+    scene.add(pl);}
+}
+
+/* cloud sea + drifting clouds */
+const cloudM=new THREE.MeshStandardMaterial({color:0xffffff,roughness:1,flatShading:true});
+function cloud(s,seed){const R=rnd(seed),g=new THREE.Group();const n=4+Math.floor(R()*4);
+  for(let i=0;i<n;i++){const p=mesh(new THREE.IcosahedronGeometry(s*(0.5+R()*0.6),1),cloudM,false,false);
+    p.position.set((i-n/2)*s*0.7,R()*s*0.3,(R()-0.5)*s*0.6);p.scale.y=0.7;g.add(p);}
+  return g;}
+const sea=new THREE.Group();
+for(let i=0;i<70;i++){const R=rnd(i*31+7);const a=R()*Math.PI*2,r=8+R()*70;
+  const c=cloud(2.5+R()*3,i+100);c.position.set(Math.cos(a)*r,-14-R()*4,Math.sin(a)*r);c.rotation.y=R()*6;sea.add(c);}
+scene.add(sea);
+const drifters=[];
+for(let i=0;i<12;i++){const R=rnd(i*97+3);const c=cloud(1+R()*1.2,i+500);
+  c.position.set((R()-0.5)*80,4+R()*12,(R()-0.5)*80);c.userData.v=0.6+R()*0.8;scene.add(c);drifters.push(c);}
+
+/* egrets flying */
+const birds=[];
+for(let i=0;i<6;i++){const b=new THREE.Group();
+  const body=mesh(new THREE.ConeGeometry(0.1,0.5,5),M(0xffffff),false,false);body.rotation.z=Math.PI/2;b.add(body);
+  const wl=mesh(new THREE.BoxGeometry(0.18,0.02,0.6),M(0xffffff),false,false);wl.position.z=0.3;const wr=wl.clone();wr.position.z=-0.3;
+  const pl=new THREE.Group();pl.add(wl);const pr=new THREE.Group();pr.add(wr);b.add(pl,pr);
+  b.userData={r:18+i*2.5,s:0.12+i*0.015,h:8+i*0.8,p:i,pl,pr};scene.add(b);birds.push(b);}
+
+/* ---------------- sky & lighting from real time ---------------- */
+const C=h=>new THREE.Color(h);
+const KEY=[ // sun altitude → [top, mid(horizon), bottom, sunColor, intensity, hemi]
+  [-18,C(0x0d1630),C(0x1d2a4d),C(0x2a3557),C(0x8fa6d9),0.25,0.28],
+  [-6, C(0x26355f),C(0x7a5d7f),C(0x4a4f72),C(0x9fb0e0),0.3,0.32],
+  [0,  C(0x5a79a8),C(0xf2a776),C(0xe8b8a0),C(0xffb27a),0.75,0.45],
+  [8,  C(0x77a9d1),C(0xf6d1a6),C(0xf1dfcf),C(0xffd2a0),1.2,0.55],
+  [25, C(0x6fb0dc),C(0xcfe6f0),C(0xeaf3f5),C(0xfff3dc),1.55,0.62],
+  [70, C(0x5aa6dc),C(0xc4e2f2),C(0xeaf4f8),C(0xffffff),1.7,0.66]];
+function skyFor(alt){
+  let i=0;while(i<KEY.length-1&&alt>KEY[i+1][0])i++;
+  const a=KEY[i],b=KEY[Math.min(i+1,KEY.length-1)];
+  const t=b===a?0:Math.min(1,Math.max(0,(alt-a[0])/(b[0]-a[0])));
+  const L=(x,y)=>x.clone().lerp(y,t);
+  return {top:L(a[1],b[1]),mid:L(a[2],b[2]),bot:L(a[3],b[3]),sun:L(a[4],b[4]),I:a[5]+(b[5]-a[5])*t,H:a[6]+(b[6]-a[6])*t};
+}
+let offsetH=0;
+const $=id=>document.getElementById(id);
+function phaseName(a){return a< -12?"深夜":a< -6?"夜幕":a<0?"暮光":a<8?(isMorning()?"晨曦":"夕照"):a<30?"晴空":"正午豔陽"}
+let lastSun={alt:0,az:0};
+function isMorning(){return twParts(now()).h<12}
+const now=()=>Date.now()+offsetH*3600000;
+let lastRiseDay="", riseCache="", termCache=null;
+
+function applyTime(){
+  const t=now(), s=sunAt(t); lastSun=s;
+  const k=skyFor(s.alt);
+  skyU.top.value.copy(k.top);skyU.mid.value.copy(k.mid);skyU.bot.value.copy(k.bot);
+  scene.fog.color.copy(k.mid);
+  document.body.style.background="#"+k.mid.getHexString();
+  // sun direction (azimuth from north, clockwise) → scene: north = -z
+  const alt=s.alt*rad, az=s.az*rad;
+  const dir=new THREE.Vector3(Math.sin(az)*Math.cos(alt),Math.sin(alt),-Math.cos(az)*Math.cos(alt));
+  sunDisc.position.copy(dir.clone().multiplyScalar(150));sunDisc.visible=s.alt>-4;
+  const mdir=dir.clone().multiplyScalar(-1);mdir.y=Math.abs(mdir.y)*0.8+0.25;mdir.normalize();
+  moonDisc.position.copy(mdir.clone().multiplyScalar(150));moonDisc.visible=s.alt<2;
+  const night=s.alt<-2;
+  const L=night?mdir:dir.clone().setY(Math.max(dir.y,0.12)).normalize();
+  sun.position.copy(L.clone().multiplyScalar(60));sun.color.copy(k.sun);sun.intensity=k.I;
+  hemi.intensity=k.H;hemi.color.copy(k.top.clone().lerp(C(0xffffff),0.5));
+  cloudM.color.copy(C(0xffffff).lerp(k.mid,night?0.65:0.18));
+  starMat.opacity=Math.max(0,Math.min(1,(-s.alt-4)/8));
+  const glow=Math.max(0,Math.min(1,(2-s.alt)/8));
+  lampMats.forEach(m=>m.emissiveIntensity=glow*1.6);
+  // spoonbills only in season
+  const m=twParts(t).m, inSeason=(m>=10||m<=4);
+  islandObjs[3].traverse(o=>{if(o.userData&&o.userData.spoon)o.visible=inSeason;});
+  updateLive(t,s);
+}
+const WD="日一二三四五六";
+function updateLive(t,s){
+  const p=twParts(t);
+  $("clock").textContent=pad(p.h)+":"+pad(p.mi)+":"+pad(p.s);
+  $("date").textContent=`${p.y} 年 ${p.m} 月 ${p.d} 日 · 星期${WD[p.wd]} · 臺灣時間`;
+  $("phase").textContent=phaseName(s.alt);
+  $("alt").innerHTML=`${s.alt.toFixed(1)}° <small>方位 ${((s.az+360)%360).toFixed(0)}°</small>`;
+  const dayKey=p.y+"-"+p.m+"-"+p.d;
+  if(dayKey!==lastRiseDay){lastRiseDay=dayKey;riseCache=riseSet(t);termCache=nextTerm(t);}
+  $("rise").textContent=riseCache;
+  const mp=moonPhase(t);$("moon").innerHTML=`${mp.name} <small>月齡 ${mp.age.toFixed(1)}</small>`;
+  $("term").innerHTML=`${TERMS[Math.floor(s.lon/15)]}`+(termCache?` <small>${termCache.m}/${termCache.d} ${termCache.name}</small>`:"");
+  const idx=s.alt<=0?0:Math.round(Math.min(10,Math.sin(s.alt*rad)*11));
+  $("saltIdx").innerHTML=`${"▮".repeat(idx)}${"▯".repeat(10-idx)} <small>${idx}/10</small>`;
+  const live=offsetH===0;
+  $("liveDot").classList.toggle("off",!live);
+  $("liveLabel").textContent=live?"即時 · 北門天空":"時光捲軸 · 模擬";
+  if(current>=0)$("pNow").textContent=ISLES[current].now(t);
+}
+
+/* ---------------- UI ---------------- */
+const nav=$("nav"), tagsEl=$("tags");
+const tagEls=ISLES.map((d,i)=>{
+  const b=document.createElement("button");b.className="chip";b.id="chip-"+d.id;
+  b.innerHTML=`<small>${d.place.split(" · ")[0]}</small><span>${d.short}</span>`;
+  b.addEventListener("click",()=>select(i));nav.appendChild(b);
+  const t=document.createElement("div");t.className="tag";t.innerHTML=`<i>${pad(i)}</i>${d.short}`;
+  t.addEventListener("click",()=>select(i));tagsEl.appendChild(t);
+  return t;
+});
+
+let current=-1;
+const fly={active:false,t:0,fromP:new THREE.Vector3(),toP:new THREE.Vector3(),fromT:new THREE.Vector3(),toT:new THREE.Vector3()};
+function flyTo(pos,target,dur=1.6){
+  fly.fromP.copy(camera.position);fly.toP.copy(pos);fly.fromT.copy(controls.target);fly.toT.copy(target);
+  fly.t=0;fly.dur=reduce?0.01:dur;fly.active=true;
+}
+function select(i,opts={}){
+  if(!opts.fromTour&&touring)endTour(false);
+  current=i; controls.autoRotate=false;
+  const d=ISLES[i], g=islandObjs[i];
+  const tgt=g.position.clone().add(new THREE.Vector3(0,1,0));
+  const out=g.position.clone().setY(0); if(out.lengthSq()<1)out.set(1,0,1.2);
+  out.normalize();
+  const dist=d.r*3.0+6;
+  const cam=tgt.clone().add(out.multiplyScalar(dist)).add(new THREE.Vector3(0,dist*0.55,0));
+  // shift view so island sits left of the panel on desktop
+  flyTo(cam,tgt);
+  $("pPlace").textContent=d.place;$("pTitle").textContent=d.title;$("pSub").textContent=d.sub;
+  $("pBody").innerHTML=
+    `<div class="nowbox"><span class="lbl">此刻</span><div id="pNow">${d.now(now())}</div></div>`+
+    d.text.map(p=>`<p>${p}</p>`).join("")+
+    worksHTML(d.id)+
+    `<div class="h3">相關人物與關鍵字</div><div class="people">${d.people.map(x=>`<span>${x}</span>`).join("")}</div>`+
+    `<div class="h3">年表</div><ul class="timeline">${d.timeline.map(([y,x])=>`<li><b>${y}</b><span>${x}</span></li>`).join("")}</ul>`;
+  const showPanel=opts.panel!==false;
+  $("panel").classList.toggle("open",showPanel);$("panel").setAttribute("aria-hidden",String(!showPanel));
+  document.body.classList.toggle("panel-open",showPanel);
+  document.querySelectorAll(".chip").forEach((c,k)=>c.setAttribute("aria-current",k===i?"true":"false"));
+  const chip=$("chip-"+d.id); chip.scrollIntoView({block:"nearest",inline:"center",behavior:reduce?"auto":"smooth"});
+  hideHint();
+  if(!opts.fromTour)guideVisit(i);
+  try{localStorage.setItem("saltland-last",d.id)}catch(e){}
+}
+function hidePanel(){$("panel").classList.remove("open");$("panel").setAttribute("aria-hidden","true");document.body.classList.remove("panel-open");}
+function closePanel(){
+  hidePanel();
+  if(touring)return; // the tour keeps its camera; only the card closes
+  current=-1;
+  document.querySelectorAll(".chip").forEach(c=>c.setAttribute("aria-current","false"));
+  flyTo(new THREE.Vector3(34,26,40),new THREE.Vector3(0,0,0));
+  flyGuide(0);
+  setTimeout(()=>{if(current<0)controls.autoRotate=!reduce},1700);
+}
+$("close").addEventListener("click",closePanel);
+addEventListener("keydown",e=>{if(e.target&&/INPUT|TEXTAREA/.test(e.target.tagName))return;
+  if(e.key==="Escape"&&current>=0)closePanel();
+  if(e.key==="ArrowRight")select((current+1+ISLES.length)%ISLES.length);
+  if(e.key==="ArrowLeft")select((current-1+ISLES.length)%ISLES.length);});
+
+$("scrub").addEventListener("input",e=>{offsetH=+e.target.value;
+  const h=Math.trunc(offsetH),m=Math.round(Math.abs(offsetH%1)*60);
+  $("offsetLbl").textContent=offsetH===0?"現在":`${offsetH>0?"+":"−"}${Math.abs(h)} 小時${m?` ${m} 分`:""}`;applyTime();});
+$("nowBtn").addEventListener("click",()=>{offsetH=0;$("scrub").value=0;$("offsetLbl").textContent="現在";applyTime();});
+$("toggleLive").addEventListener("click",e=>{const c=$("live").classList.toggle("collapsed");e.target.textContent=c?"展開":"收合";e.target.setAttribute("aria-expanded",String(!c));});
+let hintHidden=false;function hideHint(){if(!hintHidden){hintHidden=true;$("hint").style.opacity=0;}}
+setTimeout(hideHint,7000);
+
+/* picking */
+const ray=new THREE.Raycaster(),ptr=new THREE.Vector2();let down=null;
+canvas.addEventListener("pointerdown",e=>{down=[e.clientX,e.clientY];controls.autoRotate=false;hideHint();});
+canvas.addEventListener("pointerup",e=>{
+  if(!down||Math.hypot(e.clientX-down[0],e.clientY-down[1])>6)return;
+  ptr.set(e.clientX/innerWidth*2-1,-(e.clientY/innerHeight)*2+1);ray.setFromCamera(ptr,camera);
+  if(ray.intersectObject(guide,true)[0]){guidePoked();return;}
+  const hit=ray.intersectObjects(isleGroup.children,true)[0];
+  if(hit&&hit.object.userData.isle!==undefined)select(hit.object.userData.isle);
+});
+canvas.addEventListener("pointermove",e=>{
+  ptr.set(e.clientX/innerWidth*2-1,-(e.clientY/innerHeight)*2+1);ray.setFromCamera(ptr,camera);
+  const hit=ray.intersectObjects(isleGroup.children,true)[0];
+  canvas.style.cursor=hit?"pointer":"grab";
+});
+
+function resize(){const w=innerWidth,h=innerHeight;renderer.setSize(w,h,false);camera.aspect=w/h;
+  camera.fov=w<600?55:42;camera.updateProjectionMatrix();}
+addEventListener("resize",resize);resize();
+
+/* ================= 導覽員 琵琵 ================= */
+function makeGuide(){
+  const g=new THREE.Group();
+  const white=M(0xfdfcf8,{roughness:0.85}),black=M(0x232220),gold=M(0xe2bd5c),hatM=M(0xd9b56a),band=M(0xb5543a);
+  const body=mesh(new THREE.SphereGeometry(0.5,14,10),white);body.scale.set(1.35,1,1);body.position.y=0.95;g.add(body);
+  const breast=mesh(new THREE.SphereGeometry(0.3,10,8),gold);breast.scale.set(0.6,0.7,0.9);breast.position.set(0.48,1.08,0);g.add(breast);
+  const tail=mesh(new THREE.ConeGeometry(0.22,0.5,6),white);tail.rotation.z=Math.PI/2+0.3;tail.position.set(-0.75,1.05,0);g.add(tail);
+  const neck=mesh(new THREE.CylinderGeometry(0.11,0.15,0.7,8),white);neck.position.set(0.45,1.45,0);neck.rotation.z=-0.35;g.add(neck);
+  const head=new THREE.Group();head.position.set(0.62,1.85,0);g.add(head);
+  head.add(mesh(new THREE.SphereGeometry(0.22,12,10),white));
+  const mask=mesh(new THREE.SphereGeometry(0.17,10,8),black);mask.scale.set(1,0.9,1.06);mask.position.set(0.1,-0.02,0);head.add(mask);
+  for(const s of [1,-1]){const ew=mesh(new THREE.SphereGeometry(0.045,8,6),M(0xffffff),false,false);ew.position.set(0.15,0.05,s*0.15);head.add(ew);
+    const ep=mesh(new THREE.SphereGeometry(0.025,6,4),black,false,false);ep.position.set(0.18,0.05,s*0.17);head.add(ep);}
+  const bill=new THREE.Group();bill.position.set(0.22,-0.06,0);head.add(bill);
+  const shaft=mesh(new THREE.BoxGeometry(0.55,0.05,0.09),black);shaft.position.x=0.27;bill.add(shaft);
+  const spoon=mesh(new THREE.CylinderGeometry(0.12,0.12,0.05,14),black);spoon.position.x=0.58;spoon.scale.z=0.95;bill.add(spoon);
+  for(let i=0;i<4;i++){const c=mesh(new THREE.ConeGeometry(0.05,0.32,5),gold);c.position.set(-0.2,0.06+i*0.03,(i-1.5)*0.05);c.rotation.z=1.25+i*0.08;head.add(c);}
+  const hat=mesh(new THREE.ConeGeometry(0.38,0.2,18),hatM);hat.position.y=0.27;head.add(hat);
+  const hb=mesh(new THREE.CylinderGeometry(0.19,0.21,0.05,14),band);hb.position.y=0.19;head.add(hb);
+  const wings=[];
+  for(const s of [1,-1]){const piv=new THREE.Group();piv.position.set(-0.05,1.08,s*0.4);
+    const w=mesh(new THREE.SphereGeometry(0.42,10,8),white);w.scale.set(1.2,0.16,0.62);w.position.z=s*0.26;piv.add(w);
+    const tip=mesh(new THREE.SphereGeometry(0.16,8,6),black);tip.scale.set(1.4,0.2,0.5);tip.position.set(-0.4,0,s*0.42);piv.add(tip);
+    g.add(piv);wings.push(piv);}
+  for(const s of [1,-1]){const lg=mesh(new THREE.CylinderGeometry(0.03,0.03,0.6,5),black);lg.position.set(0.05,0.3,s*0.13);g.add(lg);
+    const ft=mesh(new THREE.BoxGeometry(0.22,0.03,0.12),black);ft.position.set(0.12,0.02,s*0.13);g.add(ft);}
+  const bag=mesh(new THREE.BoxGeometry(0.26,0.22,0.08),M(0xb5543a));bag.position.set(0.05,0.82,0.52);bag.rotation.x=-0.15;g.add(bag);
+  const pg=mesh(new THREE.BoxGeometry(0.18,0.06,0.02),M(0xfbf6ec));pg.position.set(0.05,0.95,0.55);g.add(pg);
+  g.scale.setScalar(0.85);
+  g.userData={head,wings,bill};
+  return g;
+}
+const guide=makeGuide();scene.add(guide);
+const G={isle:0,offset:new THREE.Vector3(),from:new THREE.Vector3(),t:1,dur:1.8,talking:false,lastDir:new THREE.Vector3(1,0,0)};
+function spotOffset(i){
+  const d=ISLES[i],p=islandObjs[i].position;
+  const out=new THREE.Vector3(p.x,0,p.z);if(out.lengthSq()<1)out.set(1,0,1.2);out.normalize();
+  const side=new THREE.Vector3(-out.z,0,out.x);
+  return out.multiplyScalar(d.r*0.62).add(side.multiplyScalar(d.r*0.42)).setY(0.72);
+}
+function flyGuide(i){G.from.copy(guide.position);G.isle=i;G.offset.copy(spotOffset(i));G.t=0;G.dur=reduce?0.01:1.9;}
+G.offset.copy(spotOffset(0));guide.position.copy(islandObjs[0].position).add(G.offset);
+const _tgt=new THREE.Vector3(),_dir=new THREE.Vector3();
+function faceToward(dx,dz,k){const a=Math.atan2(-dz,dx);let d=a-guide.rotation.y;d=Math.atan2(Math.sin(d),Math.cos(d));guide.rotation.y+=d*k;}
+function updateGuide(dt,T){
+  const u=guide.userData;
+  _tgt.copy(islandObjs[G.isle].position).add(G.offset);
+  if(G.t<1){
+    G.t=Math.min(1,G.t+dt/G.dur);const k=G.t<.5?2*G.t*G.t:1-Math.pow(-2*G.t+2,2)/2;
+    guide.position.lerpVectors(G.from,_tgt,k);guide.position.y+=Math.sin(Math.PI*k)*Math.min(5,G.from.distanceTo(_tgt)*0.25);
+    _dir.subVectors(_tgt,G.from);if(_dir.lengthSq()>0.01)faceToward(_dir.x,_dir.z,0.15);
+    const f=Math.sin(T*16)*0.9;u.wings[0].rotation.x=-f;u.wings[1].rotation.x=f;
+    guide.rotation.z=Math.sin(Math.PI*k)*0.25;
+  }else{
+    guide.position.copy(_tgt);guide.position.y+=reduce?0:Math.abs(Math.sin(T*2.2))*0.05;
+    faceToward(camera.position.x-guide.position.x,camera.position.z-guide.position.z,0.08);
+    const w=reduce?0:Math.sin(T*1.4)*0.06;u.wings[0].rotation.x=-w;u.wings[1].rotation.x=w;guide.rotation.z*=0.9;
+  }
+  u.head.rotation.z=reduce?0:(G.talking?Math.sin(T*13)*0.09:Math.sin(T*1.3)*0.05);
+  u.bill.rotation.z=G.talking&&!reduce?Math.max(0,Math.sin(T*18))*0.12:0;
+}
+
+/* ---- tour script ---- */
+const TOUR=[
+ {isle:0,lines:[
+   "歡迎來到鹽分地帶的天空之城！我是琵琵，今天由我帶你飛一圈。",
+   "我們腳下是國立臺灣文學館，前身是 1916 年落成的臺南州廳，2003 年起成為臺灣文學的家。",
+   "繩橋另一頭的五座小島，都屬於日治時期的北門郡沿海。那裡土地鹹，大家叫它「鹽分地帶」。跟我來！"]},
+ {isle:1,lines:[
+   "第一站，佳里。這裡住著吳新榮醫師，他白天看診，晚上在書房「琑琅山房」讀書寫作。",
+   "1933 年，他和郭水潭等青年組成佳里青風會；1935 年又成立臺灣文藝聯盟佳里支部。",
+   "這群以佳里為中心的寫作者，後來被稱為「鹽分地帶派」。"]},
+ {isle:2,lines:[
+   "第二站，北門。地上一格一格的是瓦盤鹽田，用碎陶片鋪底，引海水曬出鹽。",
+   "北門郡有六個鄉鎮：北門、將軍、七股、學甲、西港、佳里。土地鹹鹼、鹽田遍布，「鹽分地帶」就是這樣得名的。",
+   "吳新榮、郭水潭、王登山等人，常被並稱為「北門七子」。",
+   ()=>"看看鹽田現在的樣子："+saltNow(now())]},
+ {isle:3,lines:[
+   "第三站是我的老家，七股！那座白色小山是鹽山。臺灣的日曬鹽業在 2002 年停產，鹽田慢慢變成了濕地。",
+   ()=>spoonbill(now()),
+   "在鹽分地帶的詩裡，鹽常被拿來比喻土地上的人：平凡、粗糙，卻會結晶發亮。"]},
+ {isle:4,lines:[
+   "第四站，南鯤鯓代天府。1979 年，第一屆鹽分地帶文藝營就在這裡的香客大樓舉辦。",
+   "前輩作家和年輕學生在海邊相遇，把寫作的火種一路傳了下來。"]},
+ {isle:5,lines:[
+   "最後一站，是一本攤開的大書。戰後，黃勁連、羊子喬、杜文靖等作家接棒，成立了臺灣筆會鹽分地帶分會。",
+   "他們也用台語寫作，讓這片鹹地用自己的聲音說話。"]},
+ {isle:0,lines:[()=>"導覽到這裡結束囉！你可以點任何一座島再逛一次"+(sampleFn?"，或在下面直接問我問題。":"，或拖曳畫面自由探索。")]}
+];
+const STOP_NAMES=["文學館","佳里","北門","七股","南鯤鯓","台語文學","回到文學館"];
+const lineText=l=>typeof l==="function"?l():l;
+
+/* ---- speech ---- */
+const canSpeak="speechSynthesis" in window&&"SpeechSynthesisUtterance" in window;
+let voiceOn=true;try{const v=localStorage.getItem("saltland-voice");if(v!==null)voiceOn=v==="1";}catch(e){}
+let zhVoice=null;
+function pickVoice(){if(!canSpeak)return;const vs=speechSynthesis.getVoices();
+  zhVoice=vs.find(v=>/zh[-_]TW/i.test(v.lang))||vs.find(v=>/zh[-_](HK|Hant)/i.test(v.lang))||vs.find(v=>/^zh/i.test(v.lang))||null;}
+if(canSpeak){pickVoice();speechSynthesis.addEventListener?.("voiceschanged",pickVoice);$("gVoice").hidden=false;}
+function setVoiceBtn(){const b=$("gVoice");b.setAttribute("aria-pressed",String(voiceOn));b.textContent=voiceOn?"朗讀 開":"朗讀 關";}
+setVoiceBtn();
+function speak(text){
+  if(!canSpeak||!voiceOn)return null;
+  return new Promise(res=>{
+    try{speechSynthesis.cancel();
+      const u=new SpeechSynthesisUtterance(text.replace(/[「」〈〉]/g,""));
+      u.lang=zhVoice?zhVoice.lang:"zh-TW";if(zhVoice)u.voice=zhVoice;u.rate=1.02;u.pitch=1.2;
+      const t=setTimeout(res,text.length*380+2500);
+      u.onend=u.onerror=()=>{clearTimeout(t);res();};
+      speechSynthesis.speak(u);
+    }catch(e){res();}
+  });
+}
+function hush(){if(canSpeak)try{speechSynthesis.cancel()}catch(e){}}
+
+/* ---- dialogue ---- */
+let sayId=0,typer=null;
+const gText=$("gText"),gAva=$("gAva");
+function talking(on){G.talking=on;gAva.classList.toggle("talk",on&&!reduce);}
+function say(text,{voice=true}={}){
+  const id=++sayId;clearInterval(typer);hush();
+  $("guide").classList.remove("min");$("gMin").textContent="收起";$("gMin").setAttribute("aria-expanded","true");
+  const chars=[...text];let i=0;gText.textContent="";talking(true);
+  const spoken=voice?speak(text):null;
+  return new Promise(res=>{
+    const finishTyping=()=>{gText.textContent=text;
+      const after=spoken||new Promise(r=>setTimeout(r,Math.max(1800,chars.length*95)));
+      after.then(()=>{if(id===sayId){talking(false);res(true);}else res(false);});};
+    if(reduce){finishTyping();return;}
+    typer=setInterval(()=>{if(id!==sayId){clearInterval(typer);res(false);return;}
+      i+=1;gText.textContent=chars.slice(0,i).join("");
+      if(i>=chars.length){clearInterval(typer);finishTyping();}},42);
+  });
+}
+function stopTalking(){sayId++;clearInterval(typer);hush();talking(false);}
+
+/* ---- tour engine ---- */
+let touring=false,tourId=0,paused=false,tourStop=0;
+const mobile=()=>matchMedia("(max-width:760px)").matches;
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+async function waitPaused(id){while(paused&&id===tourId)await sleep(200);return id===tourId;}
+function renderProg(){
+  const p=$("gProg");p.hidden=!touring;if(!touring)return;
+  p.innerHTML=TOUR.map((_,k)=>`<i class="${k<tourStop?"done":k===tourStop?"on":""}"></i>`).join("")+`<span>第 ${tourStop+1} / ${TOUR.length} 站 · ${STOP_NAMES[tourStop]}</span>`;
+  $("gPrev").disabled=tourStop===0;$("gNext").disabled=tourStop===TOUR.length-1;
+}
+function setTourUI(on){
+  $("gStart").hidden=on;$("gTourCtl").hidden=!on;document.body.classList.toggle("touring",on);
+  $("gPause").textContent="暫停";$("gStatus").textContent=on?"導覽進行中":"黑面琵鷺 · 鹽分地帶導覽員";renderProg();
+}
+async function runTour(from=0){
+  const id=++tourId;touring=true;paused=false;$("gQ").hidden=true;setTourUI(true);
+  for(let s=from;s<TOUR.length;s++){
+    tourStop=s;renderProg();const st=TOUR[s];
+    if(s===TOUR.length-1){hidePanel();flyTo(new THREE.Vector3(34,26,40),new THREE.Vector3(0,0,0));current=-1;
+      document.querySelectorAll(".chip").forEach(c=>c.setAttribute("aria-current","false"));}
+    else select(st.isle,{fromTour:true,panel:!mobile()});
+    if(guide.position.distanceTo(islandObjs[st.isle].position.clone().add(spotOffset(st.isle)))>1)flyGuide(st.isle);
+    await sleep(reduce?50:1500);if(id!==tourId)return;
+    const featured=s<TOUR.length-1?(WORKS[ISLES[st.isle].id]||[]).find(w=>w.line):null;
+    for(const l of featured?[...st.lines,featured.line]:st.lines){
+      if(!await waitPaused(id))return;
+      const ok=await say(lineText(l));if(!ok||id!==tourId)return;
+      await sleep(350);
+    }
+  }
+  if(id===tourId)endTour(true);
+}
+function endTour(finished){
+  tourId++;touring=false;paused=false;if(!finished)stopTalking();setTourUI(false);
+  if(!finished){gText.textContent="導覽先停在這裡。想重新出發就按「開始導覽」。";}
+  if(finished)setTimeout(()=>{if(!touring&&current<0)controls.autoRotate=!reduce},1500);
+}
+$("gStart").addEventListener("click",()=>{pickVoice();runTour(0);});
+$("gNext").addEventListener("click",()=>{stopTalking();runTour(Math.min(TOUR.length-1,tourStop+1));});
+$("gPrev").addEventListener("click",()=>{stopTalking();runTour(Math.max(0,tourStop-1));});
+$("gEnd").addEventListener("click",()=>endTour(false));
+$("gPause").addEventListener("click",e=>{
+  paused=!paused;e.target.textContent=paused?"繼續":"暫停";$("gStatus").textContent=paused?"導覽暫停中":"導覽進行中";
+  if(canSpeak)try{paused?speechSynthesis.pause():speechSynthesis.resume()}catch(_){}
+});
+$("gVoice").addEventListener("click",()=>{voiceOn=!voiceOn;setVoiceBtn();if(!voiceOn)hush();
+  try{localStorage.setItem("saltland-voice",voiceOn?"1":"0")}catch(e){}});
+$("gMin").addEventListener("click",e=>{const m=$("guide").classList.toggle("min");e.target.textContent=m?"展開":"收起";e.target.setAttribute("aria-expanded",String(!m));});
+
+/* single-island visit when the viewer clicks on their own */
+function guideVisit(i){
+  flyGuide(i);$("gQ").hidden=true;
+  const first=lineText(TOUR.find(s=>s.isle===i&&s!==TOUR[TOUR.length-1]).lines[0]);
+  const tail=sampleFn?(mobile()?"想知道更多，往下看介紹卡，或直接問我。":"想知道更多，看右邊的介紹卡，或直接問我。"):"更多內容在介紹卡裡。";
+  setTimeout(()=>{if(!touring&&current===i)say(first+tail);},reduce?0:900);
+}
+const POKES=["咕咕！要我帶你逛一圈嗎？按「開始導覽」就出發。","我的嘴巴像湯匙，在潟湖裡左右掃，就能撈到小魚小蝦。","戴斗笠是跟北門的鹽工學的，曬鹽的日頭很大喔。"];
+let pokeN=0;function guidePoked(){if(touring)return;say(POKES[pokeN++%POKES.length]);}
+
+/* ---- free questions (asks Claude on the viewer's account) ---- */
+let sampleFn=null,turns=[],askCtl=null,asking=false;
+const SUGGEST=["「鹽分地帶」這個名字怎麼來的？","吳新榮是什麼樣的人？","北門七子是哪幾位？","鹽在這些作品裡象徵什麼？"];
+$("gChips").innerHTML=SUGGEST.map(q=>`<button type="button">${q}</button>`).join("");
+$("gChips").addEventListener("click",e=>{if(e.target.tagName==="BUTTON"&&!asking){$("gInput").value=e.target.textContent;ask();}});
+if(window.claude&&typeof window.claude.use==="function"){
+  window.claude.use("sample").then(s=>{if(s){sampleFn=s;$("gAsk").hidden=false;}}).catch(()=>{});
+}
+function exhibitText(){
+  return ISLES.map(d=>`【${d.title}｜${d.place}】${d.text.join("")} 相關：${d.people.join("、")}。年表：${d.timeline.map(t=>t.join(" ")).join("；")}。`+
+    (WORKS[d.id]||[]).map(w=>` 代表作品${w.title}（${w.author}，${w.year}${w.review?"，館方審訂":"，草稿待審訂"}）：${w.card}`).join("")).join("\n");
+}
+function rules(){
+  const p=twParts(now());
+  return `你是「琵琵」，一隻戴斗笠的黑面琵鷺，是國立臺灣文學館線上特展「臺南鹽分地帶文學」3D 浮空群島網站的導覽員。
+回答規則：
+- 使用臺灣慣用的繁體中文，語氣親切、像現場導覽員，偶爾可自稱琵琵。
+- 每次回答 2 到 4 句，不超過 140 字。純文字，不用 Markdown、條列、標題或表情符號。
+- 只談鹽分地帶文學、相關作家與作品、日治北門郡沿海（北門、將軍、七股、學甲、西港、佳里）的歷史與地景、黑面琵鷺與鹽田、臺灣文學館與本網站。其他話題請溫和地帶回展覽。
+- 史實務必正確。下方展覽內容可直接採用；展覽沒寫到而你不確定的人名、年份或細節，要坦白說不確定，建議查閱臺灣文學館的資料，不可編造。
+- 不要大段引用受著作權保護的詩文，用自己的話介紹即可。
+- 開放時間、票價、活動等營運資訊，一律請訪客以臺灣文學館官網公告為準。
+展覽內容：
+${exhibitText()}
+現在是臺灣時間 ${p.y}/${p.m}/${p.d} ${pad(p.h)}:${pad(p.mi)}，訪客正在看「${current>=0?ISLES[current].title:"群島全景"}」。`;
+}
+const ERR={
+  rate_limited:"問題有點多，琵琵先喘口氣，等一下再問我好嗎？",
+  session_expired:"登入狀態過期了，請重新登入 Claude 後再問。",
+  refused:"這個問題琵琵沒辦法回答，換個問法試試看？",
+  empty_completion:"琵琵一時想不出來，換個問法試試看？",
+  prompt_too_large:"對話太長了，琵琵忘了開頭。請重新整理頁面再問。"
+};
+const HIDE=["not_granted","sampling_disabled","not_declared","capability_disabled","capability_removed"];
+async function ask(){
+  if(asking){askCtl?.abort();return;}
+  const q=$("gInput").value.trim();if(!q||!sampleFn)return;
+  if(touring&&!paused)$("gPause").click();
+  stopTalking();asking=true;askCtl=new AbortController();
+  $("gSend").textContent="停止";$("gInput").value="";
+  $("gQ").hidden=false;$("gQ").textContent="你問："+q;
+  $("guide").classList.remove("min");gText.textContent="琵琵想一下……";talking(true);
+  const msgs=[{role:"user",content:rules()},...turns.slice(-6),{role:"user",content:q}];
+  try{
+    const {text}=await sampleFn(msgs,{modelTier:"quick",cache:false,signal:askCtl.signal,onText:({text})=>{gText.textContent=text;}});
+    turns.push({role:"user",content:q},{role:"assistant",content:text});
+    gText.textContent=text;const sp=speak(text);if(sp)await sp;
+  }catch(e){
+    const code=e&&e.code;
+    if(code==="cancelled"){gText.textContent=(e.text||"")+(e.text?"\n":"")+"（已停止）";}
+    else if(HIDE.includes(code)){gText.textContent="這個頁面目前無法向琵琵提問，不過導覽還是可以照常使用。";$("gAsk").hidden=true;sampleFn=null;}
+    else if(code==="refused"){gText.textContent=ERR.refused;}
+    else{gText.textContent=(e&&e.text?e.text+"\n（回答中斷）":"")||(ERR[code]||"訊號被雲層擋住了，請再問一次。");}
+  }finally{asking=false;talking(false);$("gSend").textContent="問琵琵";}
+}
+$("gAsk").addEventListener("submit",e=>{e.preventDefault();ask();});
+
+/* ---------------- loop ---------------- */
+const clock=new THREE.Clock();const v=new THREE.Vector3();let acc=0;
+function tick(){
+  const dt=Math.min(clock.getDelta(),0.05),T=clock.elapsedTime;
+  if(fly.active){fly.t+=dt/fly.dur;const k=fly.t>=1?1:1-Math.pow(1-fly.t,3);
+    camera.position.lerpVectors(fly.fromP,fly.toP,k);controls.target.lerpVectors(fly.fromT,fly.toT,k);if(fly.t>=1)fly.active=false;}
+  controls.update();
+  if(!reduce){
+    islandObjs.forEach(g=>{g.position.y=g.userData.baseY+Math.sin(T*0.6+g.userData.phase)*0.35;g.rotation.y=Math.sin(T*0.15+g.userData.phase)*0.03;});
+    sea.rotation.y=T*0.005;
+    drifters.forEach(c=>{c.position.x+=c.userData.v*dt;if(c.position.x>50)c.position.x=-50;});
+    birds.forEach(b=>{const u=b.userData,a=T*u.s+u.p;b.position.set(Math.cos(a)*u.r,u.h+Math.sin(T+u.p)*0.6,Math.sin(a)*u.r);
+      b.rotation.y=-a;const f=Math.sin(T*8+u.p)*0.6;u.pl.rotation.x=f;u.pr.rotation.x=-f;});
+    animated.forEach(a=>{
+      if(a.type==="spin")a.o.rotation.z+=dt*1.6;
+      else if(a.type==="worker"){a.o.position.x=a.b.x+Math.sin(T*0.5)*0.6;a.o.rotation.y=Math.cos(T*0.5)>0?0:Math.PI;}
+      else if(a.type==="bird"){a.o.rotation.x=Math.max(0,Math.sin(T*1.3+a.seed))*0.35;}
+      else if(a.type==="sway"){a.o.rotation.z=Math.sin(T*1.6+a.seed)*0.15;}
+      else if(a.type==="page"){const c=(T*0.35)%2;a.o.rotation.z=c<1?Math.PI*(0.5-0.5*Math.cos(Math.PI*c)):Math.PI;a.o.visible=c<1.05;}
+    });
+  }
+  sun.target.position.copy(controls.target);
+  updateGuide(dt,T);
+  // labels
+  islandObjs.forEach((g,i)=>{v.copy(g.position);v.y+=ISLES[i].id==="museum"?5.4:3.4;v.project(camera);
+    const el=tagEls[i];const vis=v.z<1&&Math.abs(v.x)<1.1&&Math.abs(v.y)<1.1;
+    el.style.opacity=vis?(current>=0&&current!==i?0.45:1):0;
+    el.style.left=((v.x+1)/2*innerWidth)+"px";el.style.top=((1-v.y)/2*innerHeight)+"px";});
+  acc+=dt;if(acc>1){acc=0;applyTime();}
+  renderer.render(scene,camera);
+  requestAnimationFrame(tick);
+}
+applyTime();
+requestAnimationFrame(tick);
+setTimeout(()=>$("loader").classList.add("done"),300);
+})();
+</script>
+
+</body></html>
